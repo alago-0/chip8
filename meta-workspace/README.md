@@ -1,0 +1,1 @@
+This is meta workspace for reasoning about chip8 and adding and finishing tasks

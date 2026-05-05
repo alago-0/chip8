@@ -1,0 +1,1 @@
+This is repo for studying chip8 and creating emulator for it
