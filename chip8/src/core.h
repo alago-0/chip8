@@ -1,8 +1,10 @@
+// --------------------------------------------------------- //
+// -------------------- CHIP 8 CORE ------------------------ //
+// --------------------------------------------------------- //
 #ifndef CORE_H
 #define CORE_H
 
 #include <stdint.h>
-
 
 const uint16_t RAM_SIZE = 4096; // 0x000 to 0xFFF
 const uint16_t RAM_MAX = 4095; // 0xFFF
@@ -22,6 +24,5 @@ typedef struct
   uint16_t   stack[STACK_SIZE]; 
 }
 Core;
-
 
 #endif
