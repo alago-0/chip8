@@ -4,13 +4,16 @@
 #ifndef CORE_H
 #define CORE_H
 
+
 #include <stdint.h>
+
 
 const uint16_t RAM_SIZE = 4096; // 0x000 to 0xFFF
 const uint16_t RAM_MAX = 4095; // 0xFFF
 const uint16_t RAM_START = 512; // 0x200 = 512 (most chip8 programs' start)
 const uint8_t STACK_SIZE = 16;
 const uint8_t GENERAL_REGISTERS_NUMBER = 16;
+
 
 typedef struct
 {
@@ -24,5 +27,6 @@ typedef struct
   uint16_t   stack[STACK_SIZE]; 
 }
 Core;
+
 
 #endif
