@@ -16,6 +16,16 @@ extern const unsigned short LOGICAL_HEIGHT;
 extern const unsigned short WINDOW_WIDTH;
 extern const unsigned short WINDOW_HEIGHT;
 
+extern const unsigned short R_SET;
+extern const unsigned short G_SET;
+extern const unsigned short B_SET;
+extern const unsigned short A_SET;
+
+extern const unsigned short R_ERASE;
+extern const unsigned short G_ERASE;
+extern const unsigned short B_ERASE;
+extern const unsigned short A_ERASE;
+
 
 typedef struct
 {
@@ -27,8 +37,17 @@ typedef struct
 Display;
 
 
-Display display_init();
+Display display_init(void);
 void display_destroy(Display *display);
-
+void clear_canvas(Display *display);
+void draw_pixel(Display *display, 
+                unsigned short x, 
+                unsigned short y, 
+                unsigned short r,
+                unsigned short g,
+                unsigned short b,
+                unsigned short a);
+void erase_pixel(Display *display, unsigned short x, unsigned short y);
+void set_pixel(Display *display, unsigned short x, unsigned short y);
 
 #endif
