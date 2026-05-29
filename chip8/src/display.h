@@ -39,15 +39,20 @@ Display;
 
 Display display_init(void);
 void display_destroy(Display *display);
-void clear_canvas(Display *display);
-void draw_pixel(Display *display, 
-                unsigned short x, 
-                unsigned short y, 
-                unsigned short r,
-                unsigned short g,
-                unsigned short b,
-                unsigned short a);
-void erase_pixel(Display *display, unsigned short x, unsigned short y);
-void set_pixel(Display *display, unsigned short x, unsigned short y);
+void display_clear_canvas(Display *display);
+void display_draw_pixel(Display *display, 
+                        unsigned short x, 
+                        unsigned short y, 
+                        unsigned short r,
+                        unsigned short g,
+                        unsigned short b,
+                        unsigned short a);
+void display_erase_pixel(Display *display,
+                         unsigned short x,
+                        unsigned short y);
+void display_set_pixel(Display *display,
+                       unsigned short x,
+                       unsigned short y);
+void display_render_present(Display *display);
 
 #endif

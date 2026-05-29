@@ -7,8 +7,8 @@ int main(void)
 
   Display display = display_init();
 
-  set_pixel(&display, 10, 10);
-  SDL_RenderPresent(display.renderer);
+  display_set_pixel(&display, 10, 10);
+  display_render_present(&display);
   while (display.is_running)
   {
     while (SDL_PollEvent(&display.event))

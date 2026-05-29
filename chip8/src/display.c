@@ -54,7 +54,7 @@ Display display_init(void)
   SDL_RenderSetLogicalSize(display.renderer,
                            LOGICAL_WIDTH,
                            LOGICAL_HEIGHT);
-  clear_canvas(&display);
+  display_clear_canvas(&display);
   SDL_RenderPresent(display.renderer);
   
   display.is_running = true;
@@ -68,7 +68,7 @@ void display_destroy(Display *display)
   SDL_Quit();  
 }
 
-void clear_canvas(Display *display)
+void display_clear_canvas(Display *display)
 {
   SDL_SetRenderDrawColor(display->renderer,
                          R_ERASE,
@@ -78,13 +78,13 @@ void clear_canvas(Display *display)
   SDL_RenderClear(display->renderer);
 }
 
-void draw_pixel(Display *display,
-                unsigned short x,
-                unsigned short y,
-                unsigned short r,
-                unsigned short g,
-                unsigned short b,
-                unsigned short a)
+void display_draw_pixel(Display *display,
+                        unsigned short x,
+                        unsigned short y,
+                        unsigned short r,
+                        unsigned short g,
+                        unsigned short b,
+                        unsigned short a)
 {
   if (x < LOGICAL_WIDTH &&
       y < LOGICAL_HEIGHT)
@@ -100,28 +100,33 @@ void draw_pixel(Display *display,
   }
 }
 
-void erase_pixel(Display *display,
-                 unsigned short x,
-                 unsigned short y)
+void display_erase_pixel(Display *display,
+                         unsigned short x,
+                         unsigned short y)
 {
-  draw_pixel(display,
-             x,
-             y,
-             R_ERASE,
-             G_ERASE,
-             B_ERASE,
-             A_ERASE);
+  display_draw_pixel(display,
+                     x,
+                     y,
+                     R_ERASE,
+                     G_ERASE,
+                     B_ERASE,
+                     A_ERASE);
 }
 
-void set_pixel(Display *display,
-               unsigned short x,
-               unsigned short y)
+void display_set_pixel(Display *display,
+                       unsigned short x,
+                       unsigned short y)
 {
-  draw_pixel(display,
-             x,
-             y,
-             R_SET,
-             G_SET,
-             B_SET,
-             A_SET);
+  display_draw_pixel(display,
+                     x,
+                     y,
+                     R_SET,
+                     G_SET,
+                     B_SET,
+                     A_SET);
+}
+
+void display_render_present(Display *display)
+{
+  SDL_RenderPresent(display->renderer);
 }
