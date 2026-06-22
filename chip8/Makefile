@@ -1,5 +1,5 @@
 CC = clang
-CFLAGS = -Wall -Wextra -Isrc $(shell pkg-config --cflags sdl2)
+CFLAGS = -Wall -Wextra -g -O0 -Isrc $(shell pkg-config --cflags sdl2)
 LDFLAGS = $(shell pkg-config --libs sdl2)
 
 

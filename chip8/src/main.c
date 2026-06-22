@@ -1,9 +1,13 @@
 #include <stdio.h>
 #include <display.h>
+#include <core.h>
 
 int main(void)
 {
   printf("hello world\n");
+
+  Core chip8_core = core_init();
+  printf("%u", chip8_core.ram[0]);
 
   Display display = display_init();
 

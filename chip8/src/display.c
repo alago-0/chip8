@@ -1,22 +1,5 @@
 #include <display.h>
 
-
-const unsigned short LOGICAL_WIDTH = 64;
-const unsigned short LOGICAL_HEIGHT = 32;
-const unsigned short WINDOW_WIDTH = 640;
-const unsigned short WINDOW_HEIGHT = 320;
-
-const unsigned short R_SET = 102;
-const unsigned short G_SET = 204;
-const unsigned short B_SET = 255;
-const unsigned short A_SET = 255;
-
-const unsigned short R_ERASE = 0;
-const unsigned short G_ERASE = 0;
-const unsigned short B_ERASE = 0;
-const unsigned short A_ERASE = 255;
-
-
 Display display_init(void)
 {
   // SDL init
@@ -61,14 +44,14 @@ Display display_init(void)
   return display;
 }
 
-void display_destroy(Display *display)
+void display_destroy(Display* display)
 {
   SDL_DestroyRenderer(display->renderer);
   SDL_DestroyWindow(display->window);
   SDL_Quit();  
 }
 
-void display_clear_canvas(Display *display)
+void display_clear_canvas(Display* display)
 {
   SDL_SetRenderDrawColor(display->renderer,
                          R_ERASE,
@@ -78,7 +61,7 @@ void display_clear_canvas(Display *display)
   SDL_RenderClear(display->renderer);
 }
 
-void display_draw_pixel(Display *display,
+void display_draw_pixel(Display* display,
                         unsigned short x,
                         unsigned short y,
                         unsigned short r,
@@ -100,7 +83,7 @@ void display_draw_pixel(Display *display,
   }
 }
 
-void display_erase_pixel(Display *display,
+void display_erase_pixel(Display* display,
                          unsigned short x,
                          unsigned short y)
 {
@@ -113,7 +96,7 @@ void display_erase_pixel(Display *display,
                      A_ERASE);
 }
 
-void display_set_pixel(Display *display,
+void display_set_pixel(Display* display,
                        unsigned short x,
                        unsigned short y)
 {
@@ -126,7 +109,7 @@ void display_set_pixel(Display *display,
                      A_SET);
 }
 
-void display_render_present(Display *display)
+void display_render_present(Display* display)
 {
   SDL_RenderPresent(display->renderer);
 }

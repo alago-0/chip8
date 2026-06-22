@@ -11,20 +11,20 @@
 #include <stdbool.h>
 
 
-extern const unsigned short LOGICAL_WIDTH;
-extern const unsigned short LOGICAL_HEIGHT;
-extern const unsigned short WINDOW_WIDTH;
-extern const unsigned short WINDOW_HEIGHT;
+#define LOGICAL_WIDTH 64
+#define LOGICAL_HEIGHT 32
+#define WINDOW_WIDTH 640
+#define WINDOW_HEIGHT 320
 
-extern const unsigned short R_SET;
-extern const unsigned short G_SET;
-extern const unsigned short B_SET;
-extern const unsigned short A_SET;
+#define R_SET 102
+#define G_SET 204
+#define B_SET 255
+#define A_SET 255
 
-extern const unsigned short R_ERASE;
-extern const unsigned short G_ERASE;
-extern const unsigned short B_ERASE;
-extern const unsigned short A_ERASE;
+#define R_ERASE 0
+#define G_ERASE 0
+#define B_ERASE 0
+#define A_ERASE 255
 
 
 typedef struct
@@ -38,21 +38,21 @@ Display;
 
 
 Display display_init(void);
-void display_destroy(Display *display);
-void display_clear_canvas(Display *display);
-void display_draw_pixel(Display *display, 
+void display_destroy(Display* display);
+void display_clear_canvas(Display* display);
+void display_draw_pixel(Display* display, 
                         unsigned short x, 
                         unsigned short y, 
                         unsigned short r,
                         unsigned short g,
                         unsigned short b,
                         unsigned short a);
-void display_erase_pixel(Display *display,
+void display_erase_pixel(Display* display,
                          unsigned short x,
                         unsigned short y);
-void display_set_pixel(Display *display,
+void display_set_pixel(Display* display,
                        unsigned short x,
                        unsigned short y);
-void display_render_present(Display *display);
+void display_render_present(Display* display);
 
 #endif
