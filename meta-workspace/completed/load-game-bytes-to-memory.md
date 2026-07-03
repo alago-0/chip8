@@ -1,0 +1,1 @@
+Get rom from arg and load into memory

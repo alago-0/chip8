@@ -30,8 +30,10 @@ typedef struct
 Core;
 
 Core core_init(void);
-void core_set_to_default(Core *core);
-void core_load_fonts(Core *core);
+void core_set_to_default(Core* core);
+void core_load_fonts(Core* core);
+void core_load_rom(Core* core,
+                   const char* path);
 
 
 #endif

@@ -1,5 +1,8 @@
 #include <core.h>
 #include <string.h>
+#include <stdio.h>
+#include <stdbool.h>
+#include <stdlib.h>
 
 
 Core core_init(void)
@@ -56,5 +59,29 @@ void core_load_fonts(Core *core)
   for (unsigned short i = 0; i < 80; ++i)
   {
     core->ram[FONT_START + i] = font_bytes[i]; 
+  }
+}
+
+void core_load_rom(Core* core,
+                   const char* path)
+{
+  // Open rom
+  FILE *f = fopen(path, "rb");
+  if (!f)
+  {
+    printf("core_load_rom failed - f == null\n");
+    exit(1);
+  }
+
+  // Load rom
+  size_t max = RAM_SIZE - RAM_START;
+  fread(&core->ram[RAM_START], 1, max, f);
+
+  bool is_too_big = fgetc(f) != EOF;
+  fclose(f);
+  if (is_too_big)
+  {
+    printf("core_load_rom failed - rom too big\n");
+    exit(1); 
   }
 }

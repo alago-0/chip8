@@ -1,28 +1,21 @@
 #include <stdio.h>
-#include <display.h>
-#include <core.h>
+#include <chip8.h>
 
-int main(void)
+
+int main(int argc, char *argv[])
 {
-  printf("hello world\n");
-
-  Core chip8_core = core_init();
-  printf("%u", chip8_core.ram[0]);
-
-  Display display = display_init();
-
-  display_set_pixel(&display, 10, 10);
-  display_render_present(&display);
-  while (display.is_running)
+  if (argc != 2)
   {
-    while (SDL_PollEvent(&display.event))
-    {
-      if (display.event.type == SDL_QUIT)
-      {
-        display.is_running = false;
-      }
-    }
+    printf("Supply rom path in first argument\n");
+    return 1;
   }
-  display_destroy(&display);
+
+  Chip8 chip8 = chip8_init();
+ 
+  // Load rom
+  const char *path = argv[1];
+  chip8_load_rom(&chip8,
+                 path);
+
   return 0;
 }
