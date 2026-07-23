@@ -35,6 +35,6 @@ void core_load_fonts(Core* core);
 void core_load_rom(Core* core,
                    const char* path);
 
-void core_fetch(Core* core);
+uint16_t core_fetch(Core* core);
 
 #endif

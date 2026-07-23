@@ -88,12 +88,19 @@ void core_load_rom(Core* core,
 }
 
 
-void core_fetch(Core* core)
+uint16_t core_fetch(Core* core)
 {
-  uint8_t first_nibble = core->ram[core->pc++];
-  uint8_t second_nibble = core->ram[core->pc++];
+  // Check for overflow
+  if (core->pc + 2 > RAM_MAX + 1)
+  {
+    printf("core_fetch failed - ram overflow\n");
+    exit(1);
+  }
 
-  uint16_t instruction = first_nibble;
-  instruction = (instruction << 2) | second_nibble;
+  uint8_t first_byte = core->ram[core->pc++];
+  uint8_t second_byte = core->ram[core->pc++];
+
+  uint16_t instruction = first_byte;
+  instruction = (instruction << 8) | second_byte;
   return instruction;
 }
