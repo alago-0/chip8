@@ -54,5 +54,5 @@ Test(core, core_fetch_at_max_valid_pc_does_not_exit, .exit_code = 0)
   core_fetch(&core);
   
   // Assert
-  cr_assert_eq(core.pc, RAM_MAX + 1);
+  cr_assert_eq(core.pc, RAM_SIZE);
 }
