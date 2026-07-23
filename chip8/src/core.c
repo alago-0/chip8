@@ -62,6 +62,7 @@ void core_load_fonts(Core *core)
   }
 }
 
+
 void core_load_rom(Core* core,
                    const char* path)
 {
@@ -84,4 +85,15 @@ void core_load_rom(Core* core,
     printf("core_load_rom failed - rom too big\n");
     exit(1); 
   }
+}
+
+
+void core_fetch(Core* core)
+{
+  uint8_t first_nibble = core->ram[core->pc++];
+  uint8_t second_nibble = core->ram[core->pc++];
+
+  uint16_t instruction = first_nibble;
+  instruction = (instruction << 2) | second_nibble;
+  return instruction;
 }
