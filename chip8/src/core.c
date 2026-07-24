@@ -31,6 +31,7 @@ void core_set_to_default(Core *core)
   core->pc = RAM_START; 
   core->sp = 0;
   memset(core->v, 0, sizeof(core->v));
+  core_clear_screen(core);
 }
 
 
@@ -103,4 +104,64 @@ uint16_t core_fetch(Core* core)
   uint16_t instruction = first_byte;
   instruction = (instruction << 8) | second_byte;
   return instruction;
+}
+
+
+void core_decode_execute(Core* core)
+{
+  // Fetch
+  uint16_t instruction = core_fetch(core);
+
+  // Decode and execute
+  switch (instruction)
+  {
+    case 0x00E0:
+      core_clear_screen(core);
+      break;
+    
+    default:
+      break;
+  }
+}
+
+
+uint8_t core_get_first_nibble(uint16_t instruction)
+{
+  return (instruction >> 12) & 0xF;
+}
+
+
+uint8_t core_get_second_nibble(uint16_t instruction)
+{
+  return ((instruction << 4) >> 12) & 0xF;
+}
+
+
+uint8_t core_get_third_nibble(uint16_t instruction)
+{
+  return ((instruction << 8) >> 12) & 0xF;
+}
+
+
+uint8_t core_get_fourth_nibble(uint16_t instruction)
+{
+  return (instruction << 12) >> 12;
+}
+
+
+uint8_t core_get_second_byte(uint16_t instruction)
+{
+  return (instruction << 8) >> 8;
+}
+
+
+uint16_t core_get_second_third_fourth_nibbles(uint16_t instruction)
+{
+  return (instruction << 4) >> 4;
+}
+
+
+void core_clear_screen(Core *core) // 00E0
+{
+  memset(core->screen, 0, sizeof(core->screen));
 }

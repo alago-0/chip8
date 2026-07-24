@@ -11,8 +11,6 @@
 #include <stdbool.h>
 
 
-#define LOGICAL_WIDTH 64
-#define LOGICAL_HEIGHT 32
 #define WINDOW_WIDTH 640
 #define WINDOW_HEIGHT 320
 

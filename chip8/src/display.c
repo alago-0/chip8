@@ -1,4 +1,5 @@
 #include <display.h>
+#include <core.h>
 
 Display display_init(void)
 {
@@ -35,8 +36,8 @@ Display display_init(void)
   }
 
   SDL_RenderSetLogicalSize(display.renderer,
-                           LOGICAL_WIDTH,
-                           LOGICAL_HEIGHT);
+                           SCREEN_LOGICAL_WIDTH,
+                           SCREEN_LOGICAL_HEIGHT);
   display_clear_canvas(&display);
   SDL_RenderPresent(display.renderer);
   
@@ -69,8 +70,8 @@ void display_draw_pixel(Display* display,
                         unsigned short b,
                         unsigned short a)
 {
-  if (x < LOGICAL_WIDTH &&
-      y < LOGICAL_HEIGHT)
+  if (x < SCREEN_LOGICAL_WIDTH &&
+      y < SCREEN_LOGICAL_HEIGHT)
   {
     SDL_SetRenderDrawColor(display->renderer,
                            r,

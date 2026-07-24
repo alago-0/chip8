@@ -15,6 +15,9 @@
 #define STACK_SIZE 16
 #define GENERAL_REGISTERS_NUMBER 16
 
+#define SCREEN_LOGICAL_WIDTH 64
+#define SCREEN_LOGICAL_HEIGHT 32
+
 
 typedef struct
 {
@@ -26,6 +29,7 @@ typedef struct
   uint16_t   pc;
   uint8_t    sp;
   uint16_t   stack[STACK_SIZE]; 
+  uint8_t    screen[SCREEN_LOGICAL_WIDTH][SCREEN_LOGICAL_HEIGHT];
 }
 Core;
 
@@ -36,5 +40,15 @@ void core_load_rom(Core* core,
                    const char* path);
 
 uint16_t core_fetch(Core* core);
+void core_decode_execute(Core* core);
+
+uint8_t core_get_first_nibble(uint16_t instruction);
+uint8_t core_get_second_nibble(uint16_t instruction);
+uint8_t core_get_third_nibble(uint16_t instruction);
+uint8_t core_get_fourth_nibble(uint16_t instruction);
+uint8_t core_get_second_byte(uint16_t instruction);
+uint16_t core_get_second_third_fourth_nibbles(uint16_t instruction);
+
+void core_clear_screen(Core* core); // 00E0
 
 #endif

@@ -27,3 +27,20 @@ void chip8_load_rom(Chip8* chip8,
                 path);
 }
 
+
+
+void chip8_run(Chip8* chip8)
+{
+  while (chip8->display.is_running)
+  {
+    while (SDL_PollEvent(&chip8->display.event))
+    {
+      if (chip8->display.event.type == SDL_QUIT)
+      {
+        chip8->display.is_running = false;
+      }
+    }
+  }
+
+  display_destroy(&chip8->display);
+}

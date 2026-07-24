@@ -56,3 +56,43 @@ Test(core, core_fetch_at_max_valid_pc_does_not_exit, .exit_code = 0)
   // Assert
   cr_assert_eq(core.pc, RAM_SIZE);
 }
+
+
+Test(core, core_get_first_nibble_is_correct)
+{
+  // Arrange
+  uint16_t instruction = 0x8234;
+
+  // Act
+  uint8_t first_nibble = core_get_first_nibble(instruction);
+
+  // Assert
+  cr_assert_eq(first_nibble, 8);
+}
+
+
+Test(core, core_get_second_nibble_is_correct)
+{
+  // Arrange
+  uint16_t instruction = 0x8234;
+
+  // Act
+  uint8_t second_nibble = core_get_second_nibble(instruction);
+
+  // Assert
+  //printf("second_nibble: %X\n", second_nibble);
+  cr_assert_eq(second_nibble, 2);
+}
+
+
+Test(core, core_get_third_nibble_is_correct)
+{
+  // Arrange
+  uint16_t instruction = 0x8234;
+
+  // Act
+  uint8_t first_nibble = core_get_third_nibble(instruction);
+
+  // Assert
+  cr_assert_eq(first_nibble, 3);
+}
