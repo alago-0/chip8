@@ -91,7 +91,7 @@ void core_load_rom(Core* core,
 uint16_t core_fetch(Core* core)
 {
   // Check for overflow
-  if (core->pc + 2 > RAM_MAX + 1)
+  if (core->pc + 2 > RAM_SIZE)
   {
     printf("core_fetch failed - ram overflow\n");
     exit(1);
