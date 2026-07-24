@@ -89,6 +89,53 @@ void core_load_rom(Core* core,
 }
 
 
+void core_clear_screen(Core *core) // 00E0
+{
+  memset(core->screen, 0, sizeof(core->screen));
+}
+
+
+bool core_screen_get_pixel(Core* core,
+                           uint8_t x,
+                           uint8_t y)
+{
+  if (x >= SCREEN_LOGICAL_WIDTH)
+  {
+    printf("core_screen_get_pixel failed - x overflow (%u)\n", x);
+    exit(1);
+  }
+
+  if (y >= SCREEN_LOGICAL_HEIGHT)
+  {
+    printf("core_screen_get_pixel faild - y overflow (%u)\n", y);
+    exit(1);
+  }
+
+  return core->screen[x][y];
+}
+
+
+void core_screen_set_pixel(Core* core,
+                           uint8_t x,
+                           uint8_t y,
+                           bool value)
+{
+  if (x >= SCREEN_LOGICAL_WIDTH)
+  {
+    printf("core_screen_set_pixel failed - x overflow (%u)\n", x);
+    exit(1);
+  }
+
+  if (y >= SCREEN_LOGICAL_HEIGHT)
+  {
+    printf("core_screen_set_pixel faild - y overflow (%u)\n", y);
+    exit(1);
+  }
+
+  core->screen[x][y] = value;
+}
+
+
 uint16_t core_fetch(Core* core)
 {
   // Check for overflow
@@ -113,55 +160,192 @@ void core_decode_execute(Core* core)
   uint16_t instruction = core_fetch(core);
 
   // Decode and execute
-  switch (instruction)
+  uint8_t first_nibble = core_instruction_get_first_nibble(instruction);
+  uint8_t second_nibble = core_instruction_get_second_nibble(instruction);
+  uint8_t third_nibble = core_instruction_get_third_nibble(instruction);
+  uint8_t fourth_nibble = core_instruction_get_fourth_nibble(instruction);
+  uint16_t second_third_fourth_nibbles = core_instruction_get_second_third_fourth_nibbles(instruction);
+  uint8_t second_byte = core_instruction_get_second_byte(instruction);
+
+  switch (first_nibble)
   {
-    case 0x00E0:
-      core_clear_screen(core);
+    case 0x0:
+      switch (second_third_fourth_nibbles)
+      {
+        case 0x0E0: // 00E0
+          core_clear_screen(core);
+          break;
+        default:
+          break;
+      }
       break;
-    
+   
+    case 0x1: // 1NNN
+      core_jump_to_address(core,
+                           second_third_fourth_nibbles);
+      break;
+
+    case 0x6: // 6XNN
+      core_set_register_v(core,
+                          second_nibble,
+                          second_byte);
+      break;
+
+    case 0x7: // 7XNN
+      core_add_to_register_v(core,
+                             second_nibble,
+                             second_byte);
+      break;
+
+    case 0xA: // ANNN
+      core_set_index(core,
+                     second_third_fourth_nibbles);
+      break;
+
+    case 0xD: // DXYN
+      core_draw(core,
+                second_nibble,
+                third_nibble,
+                fourth_nibble);
+      break;
+      
     default:
       break;
   }
 }
 
 
-uint8_t core_get_first_nibble(uint16_t instruction)
+uint8_t core_instruction_get_first_nibble(uint16_t instruction)
 {
   return (instruction >> 12) & 0xF;
 }
 
 
-uint8_t core_get_second_nibble(uint16_t instruction)
+uint8_t core_instruction_get_second_nibble(uint16_t instruction)
 {
   return ((instruction << 4) >> 12) & 0xF;
 }
 
 
-uint8_t core_get_third_nibble(uint16_t instruction)
+uint8_t core_instruction_get_third_nibble(uint16_t instruction)
 {
   return ((instruction << 8) >> 12) & 0xF;
 }
 
 
-uint8_t core_get_fourth_nibble(uint16_t instruction)
+uint8_t core_instruction_get_fourth_nibble(uint16_t instruction)
 {
-  return (instruction << 12) >> 12;
+  return instruction & 0xF;
 }
 
 
-uint8_t core_get_second_byte(uint16_t instruction)
+uint8_t core_instruction_get_second_byte(uint16_t instruction)
 {
-  return (instruction << 8) >> 8;
+  return instruction & 0xFF;
 }
 
 
-uint16_t core_get_second_third_fourth_nibbles(uint16_t instruction)
+uint16_t core_instruction_get_second_third_fourth_nibbles(uint16_t instruction)
 {
-  return (instruction << 4) >> 4;
+  return instruction & 0xFFF;
 }
 
 
-void core_clear_screen(Core *core) // 00E0
+void core_jump_to_address(Core* core,
+                          uint16_t address) // 1NNN
 {
-  memset(core->screen, 0, sizeof(core->screen));
+  if (core->pc >= RAM_MAX)
+  {
+    printf("core_jump_to_address failed - ram overflow");
+    exit(1);
+  }
+
+  core->pc = address;
+}
+
+
+void core_set_register_v(Core* core,
+                         uint8_t register_number,
+                         uint8_t value) // 6XNN
+{
+  if (register_number >= GENERAL_REGISTERS_NUMBER)
+  {
+    printf("core_set_register_v failed - register_number overflow\n");
+    exit(1);
+  }
+
+  core->v[register_number] = value;
+}
+
+
+void core_add_to_register_v(Core* core,
+                            uint8_t register_number,
+                            uint8_t value) // 7XNN
+{
+  if (register_number >= GENERAL_REGISTERS_NUMBER)
+  {
+    printf("core_set_register_v failed - register_number overflow\n");
+    exit(1);
+  }
+
+  core->v[register_number] += value;
+}
+
+
+void core_set_index(Core* core,
+                    uint16_t value) // ANNN
+{
+  core->i = value;
+}
+
+
+void core_draw(Core* core,
+               uint8_t second_nibble,
+               uint8_t third_nibble,
+               uint8_t fourth_nibble) // DXYN
+{
+  uint8_t x = core->v[second_nibble] % SCREEN_LOGICAL_WIDTH;
+  uint8_t y = core->v[third_nibble] % SCREEN_LOGICAL_HEIGHT;
+  core->v[0xF] = 0;
+
+  uint8_t row = 0;
+  while (row < fourth_nibble)
+  {
+    uint8_t draw_y = y + row;
+    if (draw_y == SCREEN_LOGICAL_HEIGHT)
+    {
+      break;
+    }
+
+    uint8_t sprite_byte = core->ram[core->i + row];
+    for (int8_t pixel = 7; pixel >=0; --pixel)
+    {
+      uint8_t draw_x = x + 7 - pixel;
+      uint8_t bit = (sprite_byte >> pixel) & (uint8_t)1;
+
+      // Draw
+      if (bit)
+      {
+        if (core_screen_get_pixel(core,
+                                  draw_x,
+                                  y + row))
+        {
+          core_screen_set_pixel(core,
+                                draw_x,
+                                y + row,
+                                false);
+          core->v[0xF] = 1;
+        }
+        else
+        {
+          core_screen_set_pixel(core,
+                                draw_x,
+                                y + row,
+                                true);
+        }
+      }
+    }
+
+    ++row;
+  }
 }

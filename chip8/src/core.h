@@ -6,6 +6,7 @@
 
 
 #include <stdint.h>
+#include <stdbool.h>
 
 
 #define RAM_SIZE 4096
@@ -29,7 +30,7 @@ typedef struct
   uint16_t   pc;
   uint8_t    sp;
   uint16_t   stack[STACK_SIZE]; 
-  uint8_t    screen[SCREEN_LOGICAL_WIDTH][SCREEN_LOGICAL_HEIGHT];
+  bool       screen[SCREEN_LOGICAL_WIDTH][SCREEN_LOGICAL_HEIGHT];
 }
 Core;
 
@@ -39,16 +40,39 @@ void core_load_fonts(Core* core);
 void core_load_rom(Core* core,
                    const char* path);
 
+bool core_screen_get_pixel(Core* core,
+                           uint8_t x,
+                           uint8_t y);
+void core_screen_set_pixel(Core* core,
+                           uint8_t x,
+                           uint8_t y,
+                           bool value);
+void core_clear_screen(Core* core); // 00E0
+
+
 uint16_t core_fetch(Core* core);
 void core_decode_execute(Core* core);
 
-uint8_t core_get_first_nibble(uint16_t instruction);
-uint8_t core_get_second_nibble(uint16_t instruction);
-uint8_t core_get_third_nibble(uint16_t instruction);
-uint8_t core_get_fourth_nibble(uint16_t instruction);
-uint8_t core_get_second_byte(uint16_t instruction);
-uint16_t core_get_second_third_fourth_nibbles(uint16_t instruction);
+uint8_t core_instruction_get_first_nibble(uint16_t instruction);
+uint8_t core_instruction_get_second_nibble(uint16_t instruction);
+uint8_t core_instruction_get_third_nibble(uint16_t instruction);
+uint8_t core_instruction_get_fourth_nibble(uint16_t instruction);
+uint8_t core_instruction_get_second_byte(uint16_t instruction);
+uint16_t core_instruction_get_second_third_fourth_nibbles(uint16_t instruction);
 
-void core_clear_screen(Core* core); // 00E0
+void core_jump_to_address(Core* core,
+                          uint16_t address); // 1NNN
+void core_set_register_v(Core* core,
+                         uint8_t register_number,
+                         uint8_t value); // 6XNN
+void core_add_to_register_v(Core* core,
+                            uint8_t register_number,
+                            uint8_t value); // 7XNN
+void core_set_index(Core* core,
+                    uint16_t value); // ANNN
+void core_draw(Core* core,
+               uint8_t second_nibble,
+               uint8_t third_nibble,
+               uint8_t fourth_nibble); // DXYN
 
 #endif
