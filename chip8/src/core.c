@@ -217,19 +217,19 @@ void core_decode_execute(Core* core)
 
 uint8_t core_instruction_get_first_nibble(uint16_t instruction)
 {
-  return (instruction >> 12) & 0xF;
+  return (instruction & 0xF000) >> 12;
 }
 
 
 uint8_t core_instruction_get_second_nibble(uint16_t instruction)
 {
-  return ((instruction << 4) >> 12) & 0xF;
+  return (instruction & 0x0F00) >> 8;
 }
 
 
 uint8_t core_instruction_get_third_nibble(uint16_t instruction)
 {
-  return ((instruction << 8) >> 12) & 0xF;
+  return (instruction & 0x00F0) >> 4;
 }
 
 
@@ -321,6 +321,11 @@ void core_draw(Core* core,
     for (int8_t pixel = 7; pixel >=0; --pixel)
     {
       uint8_t draw_x = x + 7 - pixel;
+      if (draw_x == SCREEN_LOGICAL_WIDTH)
+      {
+        break;
+      }
+
       uint8_t bit = (sprite_byte >> pixel) & (uint8_t)1;
 
       // Draw
@@ -328,11 +333,11 @@ void core_draw(Core* core,
       {
         if (core_screen_get_pixel(core,
                                   draw_x,
-                                  y + row))
+                                  draw_y))
         {
           core_screen_set_pixel(core,
                                 draw_x,
-                                y + row,
+                                draw_y,
                                 false);
           core->v[0xF] = 1;
         }
@@ -340,7 +345,7 @@ void core_draw(Core* core,
         {
           core_screen_set_pixel(core,
                                 draw_x,
-                                y + row,
+                                draw_y,
                                 true);
         }
       }
