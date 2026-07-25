@@ -184,6 +184,24 @@ void core_decode_execute(Core* core)
       core_jump_to_address(core,
                            second_third_fourth_nibbles);
       break;
+    
+    case 0x3: // 3XNN
+      core_skip_instruction_if_equal(core,
+                                     core_get_register_v(core, second_nibble),
+                                     second_byte);
+      break;
+
+    case 0x4: // 4XNN
+      core_skip_instruction_if_not_equal(core,
+                                         core_get_register_v(core, second_nibble),
+                                         second_byte);
+      break;
+
+    case 0x5: // 5XY0
+      core_skip_instruction_if_equal(core,
+                                     core_get_register_v(core, second_nibble),
+                                     core_get_register_v(core, third_nibble));
+      break;
 
     case 0x6: // 6XNN
       core_set_register_v(core,
@@ -195,6 +213,12 @@ void core_decode_execute(Core* core)
       core_add_to_register_v(core,
                              second_nibble,
                              second_byte);
+      break;
+    
+    case 0x9: // 9XY0
+      core_skip_instruction_if_not_equal(core,
+                                         core_get_register_v(core, second_nibble),
+                                         core_get_register_v(core, third_nibble));
       break;
 
     case 0xA: // ANNN
@@ -251,6 +275,19 @@ uint16_t core_instruction_get_second_third_fourth_nibbles(uint16_t instruction)
 }
 
 
+uint8_t core_get_ram(Core* core,
+                     uint16_t address)
+{
+  if (address >= RAM_MAX)
+  {
+    printf("core_get_ram failed - ram overflow");
+    exit(1);
+  }
+
+  return core->ram[address];
+}
+
+
 void core_jump_to_address(Core* core,
                           uint16_t address) // 1NNN
 {
@@ -275,6 +312,41 @@ void core_set_register_v(Core* core,
   }
 
   core->v[register_number] = value;
+}
+
+
+uint8_t core_get_register_v(Core* core,
+                            uint8_t register_number)
+{
+  if (register_number >= GENERAL_REGISTERS_NUMBER)
+  {
+    printf("core_get_register_v failed - register_number overflow\n");
+    exit(1);
+  }
+
+  return core->v[register_number];
+}
+
+
+void core_skip_instruction_if_equal(Core* core,
+                                    uint8_t value1,
+                                    uint8_t value2) // 3XNN 5XY0
+{
+  if (value1 == value2)
+  {
+    core->pc += 2;
+  }
+}
+
+
+void core_skip_instruction_if_not_equal(Core* core,
+                                        uint8_t value1,
+                                        uint8_t value2) // 4XNN, 9XY0
+{
+  if (value1 != value2)
+  {
+    core->pc += 2;
+  }
 }
 
 
@@ -306,7 +378,9 @@ void core_draw(Core* core,
 {
   uint8_t x = core->v[second_nibble] % SCREEN_LOGICAL_WIDTH;
   uint8_t y = core->v[third_nibble] % SCREEN_LOGICAL_HEIGHT;
-  core->v[0xF] = 0;
+  core_set_register_v(core,
+                      0xF,
+                      0);
 
   uint8_t row = 0;
   while (row < fourth_nibble)
@@ -317,7 +391,8 @@ void core_draw(Core* core,
       break;
     }
 
-    uint8_t sprite_byte = core->ram[core->i + row];
+    uint8_t sprite_byte = core_get_ram(core,
+                                       core->i + row);
     for (int8_t pixel = 7; pixel >=0; --pixel)
     {
       uint8_t draw_x = x + 7 - pixel;
@@ -339,7 +414,9 @@ void core_draw(Core* core,
                                 draw_x,
                                 draw_y,
                                 false);
-          core->v[0xF] = 1;
+          core_set_register_v(core,
+                              0xF,
+                              1);
         }
         else
         {

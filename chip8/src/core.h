@@ -60,11 +60,21 @@ uint8_t core_instruction_get_fourth_nibble(uint16_t instruction);
 uint8_t core_instruction_get_second_byte(uint16_t instruction);
 uint16_t core_instruction_get_second_third_fourth_nibbles(uint16_t instruction);
 
+uint8_t core_get_ram(Core* core,
+                     uint16_t address);
 void core_jump_to_address(Core* core,
                           uint16_t address); // 1NNN
+void core_skip_instruction_if_equal(Core* core,
+                                    uint8_t value1,
+                                    uint8_t value2); // 3XNN 5XY0
+void core_skip_instruction_if_not_equal(Core* core,
+                                        uint8_t value1,
+                                        uint8_t value2); // 4XNN 9XY0
 void core_set_register_v(Core* core,
                          uint8_t register_number,
                          uint8_t value); // 6XNN
+uint8_t core_get_register_v(Core* core,
+                            uint8_t register_number);
 void core_add_to_register_v(Core* core,
                             uint8_t register_number,
                             uint8_t value); // 7XNN
