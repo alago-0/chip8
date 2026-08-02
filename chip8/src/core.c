@@ -214,6 +214,26 @@ void core_decode_execute(Core* core)
                              second_nibble,
                              second_byte);
       break;
+
+    case 0x8: // 8...
+        switch (fourth_nibble)
+        {
+          case 0x0: // 8XY0
+            core_set_register_v(core,
+                                second_nibble,
+                                core_get_register_v(core,
+                                                    third_nibble));
+            break;
+          case 0x1: // 8XY1
+            core_set_register_v(core,
+                                second_nibble,
+                                core_get_register_v(core,
+                                                    second_nibble) |
+                                core_get_register_v(core,
+                                                    third_nibble));
+            break;
+        }
+        break;
     
     case 0x9: // 9XY0
       core_skip_instruction_if_not_equal(core,
