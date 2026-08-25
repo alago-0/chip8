@@ -232,6 +232,34 @@ void core_decode_execute(Core* core)
                                 core_get_register_v(core,
                                                     third_nibble));
             break;
+          case 0x2: // 8XY2
+            core_set_register_v(core,
+                                second_nibble,
+                                core_get_register_v(core,
+                                                    second_nibble) &
+                                core_get_register_v(core,
+                                                    third_nibble));
+            break;
+          case 0x3: // 8XY3
+             core_set_register_v(core,
+                                second_nibble,
+                                core_get_register_v(core,
+                                                    second_nibble) ^
+                                core_get_register_v(core,
+                                                    third_nibble));
+            break;
+
+          case 0x4: // 8XY4
+            size_t sum = (size_t) core_get_register_v(core,
+                                                      second_nibble) + core_get_register_v(core,
+                                                                                           third_nibble);
+            sum != (uint8_t)sum ? 
+                   core_set_register_v(core, 0xF, 1) :
+                   core_set_register_v(core, 0xF, 0);
+            core_set_register_v(core,
+                                second_nibble,
+                                (uint8_t) sum);
+            break;
         }
         break;
     
@@ -251,6 +279,53 @@ void core_decode_execute(Core* core)
                 second_nibble,
                 third_nibble,
                 fourth_nibble);
+      break;
+
+    case 0xF: // F...
+      switch (second_byte)
+      {
+        case 0x33: // FX33
+          uint8_t number = core_get_register_v(core,
+                                               second_nibble);
+          core_set_ram(core,
+                       core_get_index(core),
+                       number / 100);
+          core_set_ram(core,
+                       core_get_index(core) + 1,
+                       (number / 10) % 10);
+          core_set_ram(core,
+                       core_get_index(core) + 2,
+                       number % 10);
+          break;
+        case 0x55: // FX55
+          for (uint8_t i = 0; i <= second_nibble; ++i)
+          {
+            uint16_t address = core_get_index(core) + i;
+            uint8_t value = core_get_register_v(core, i);
+            core_set_ram(core,
+                         address,
+                         value);
+          } 
+          break;
+        case 0x65: // FX65
+          for (uint8_t i = 0; i <= second_nibble; ++i)
+          {
+            uint16_t address = core_get_index(core) + i;
+            uint8_t value = core_get_ram(core, address);
+            core_set_register_v(core,
+                                i,
+                                value);
+          }
+          break;
+        case 0x1E: // FX1E
+          size_t sum = (size_t) core_get_index(core) + core_get_register_v(core, second_nibble);
+          sum != (uint16_t)sum ? 
+                 core_set_register_v(core, 0xF, 1) :
+                 core_set_register_v(core, 0xF, 0);
+          core_set_index(core,
+                         (uint16_t)sum);
+          break;
+      }
       break;
       
     default:
@@ -305,6 +380,20 @@ uint8_t core_get_ram(Core* core,
   }
 
   return core->ram[address];
+}
+
+
+void core_set_ram(Core* core,
+                  uint16_t address,
+                  uint8_t value)
+{
+  if (address >= RAM_MAX)
+  {
+    printf("core_set_ram failed - ram overflow");
+    exit(1);
+  }
+
+  core->ram[address] = value;
 }
 
 
@@ -384,6 +473,12 @@ void core_add_to_register_v(Core* core,
 }
 
 
+uint16_t core_get_index(Core* core)
+{
+  return core->i;
+}
+
+
 void core_set_index(Core* core,
                     uint16_t value) // ANNN
 {
@@ -396,8 +491,8 @@ void core_draw(Core* core,
                uint8_t third_nibble,
                uint8_t fourth_nibble) // DXYN
 {
-  uint8_t x = core->v[second_nibble] % SCREEN_LOGICAL_WIDTH;
-  uint8_t y = core->v[third_nibble] % SCREEN_LOGICAL_HEIGHT;
+  uint8_t x = core_get_register_v(core, second_nibble) % SCREEN_LOGICAL_WIDTH;
+  uint8_t y = core_get_register_v(core, third_nibble) % SCREEN_LOGICAL_HEIGHT;
   core_set_register_v(core,
                       0xF,
                       0);
