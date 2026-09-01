@@ -136,7 +136,7 @@ Test(core, core_instruction_get_second_third_fourth_nibbles_is_correct)
 }
 
 
-Test(core, core_jump_to_address_is_correct)
+Test(core, core_set_pc_is_correct)
 {
   // Arrange
   Core core = core_init();

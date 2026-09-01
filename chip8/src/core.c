@@ -175,16 +175,27 @@ void core_decode_execute(Core* core)
         case 0x0E0: // 00E0
           core_clear_screen(core);
           break;
+        case 0x0EE: // 00EE
+          //core_set_pc(core,
+          //            core_pop_from_stack(core));
+          break;
         default:
           break;
       }
       break;
    
     case 0x1: // 1NNN
-      core_jump_to_address(core,
-                           second_third_fourth_nibbles);
+      core_set_pc(core,
+                  second_third_fourth_nibbles);
       break;
     
+    case 0x2: // 2NNN
+      //core_push_to_stack(core, 
+      //                   core->pc);
+      //core_set_pc(core, 
+      //            second_third_fourth_nibbles);
+      break;
+
     case 0x3: // 3XNN
       core_skip_instruction_if_equal(core,
                                      core_get_register_v(core, second_nibble),
@@ -250,6 +261,7 @@ void core_decode_execute(Core* core)
             break;
 
           case 0x4: // 8XY4
+          {
             size_t sum = (size_t) core_get_register_v(core,
                                                       second_nibble) + core_get_register_v(core,
                                                                                            third_nibble);
@@ -259,6 +271,25 @@ void core_decode_execute(Core* core)
             core_set_register_v(core,
                                 second_nibble,
                                 (uint8_t) sum);
+            break;
+          }
+          
+          case 0x5: // 8XY5
+            core_set_register_v(core,
+                                second_nibble,
+                                core_get_register_v(core,
+                                                    second_nibble) -
+                                core_get_register_v(core,
+                                                    third_nibble));
+            break;
+          
+          case 0x7: // 8XY7
+            core_set_register_v(core,
+                                second_nibble,
+                                core_get_register_v(core,
+                                                    third_nibble) -
+                                core_get_register_v(core,
+                                                    second_nibble));           
             break;
         }
         break;
@@ -285,6 +316,7 @@ void core_decode_execute(Core* core)
       switch (second_byte)
       {
         case 0x33: // FX33
+        {
           uint8_t number = core_get_register_v(core,
                                                second_nibble);
           core_set_ram(core,
@@ -297,6 +329,7 @@ void core_decode_execute(Core* core)
                        core_get_index(core) + 2,
                        number % 10);
           break;
+        }
         case 0x55: // FX55
           for (uint8_t i = 0; i <= second_nibble; ++i)
           {
@@ -318,6 +351,7 @@ void core_decode_execute(Core* core)
           }
           break;
         case 0x1E: // FX1E
+        {
           size_t sum = (size_t) core_get_index(core) + core_get_register_v(core, second_nibble);
           sum != (uint16_t)sum ? 
                  core_set_register_v(core, 0xF, 1) :
@@ -325,6 +359,7 @@ void core_decode_execute(Core* core)
           core_set_index(core,
                          (uint16_t)sum);
           break;
+        }
       }
       break;
       
@@ -397,12 +432,12 @@ void core_set_ram(Core* core,
 }
 
 
-void core_jump_to_address(Core* core,
-                          uint16_t address) // 1NNN
+void core_set_pc(Core* core,
+                 uint16_t address) // 1NNN
 {
   if (core->pc >= RAM_MAX)
   {
-    printf("core_jump_to_address failed - ram overflow");
+    printf("core_set_pc failed - ram overflow");
     exit(1);
   }
 
@@ -470,6 +505,35 @@ void core_add_to_register_v(Core* core,
   }
 
   core->v[register_number] += value;
+}
+
+
+void core_push_to_stack(Core* core,
+                        uint16_t value)
+{
+  if (core->sp >= STACK_SIZE)
+  {
+    printf("core_push_to_stack failed - sp overflow");
+    exit(1);
+  }
+
+  core->stack[core->sp++] = value;
+  printf("--- core_push_to_stac DEBUG ---\n");
+  printf("core->sp = %d\n", core->sp);
+  printf("core->stack[core->sp - 1] = %d\n", core->stack[core->sp - 1]);
+  printf("core->stack[core->sp] = %d\n", core->stack[core->sp]);
+}
+
+
+uint16_t core_pop_from_stack(Core* core)
+{
+  if (core->sp < 0)
+  {
+    printf("core_pop_from_stack failed - sp overflow");
+    exit(1);
+  }
+
+  return core->stack[core->sp--];
 }
 
 

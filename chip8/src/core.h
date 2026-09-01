@@ -66,8 +66,8 @@ void core_set_ram(Core* core,
                   uint16_t address,
                   uint8_t value);
 
-void core_jump_to_address(Core* core,
-                          uint16_t address); // 1NNN
+void core_set_pc(Core* core,
+                 uint16_t address); // 1NNN
 void core_skip_instruction_if_equal(Core* core,
                                     uint8_t value1,
                                     uint8_t value2); // 3XNN 5XY0
@@ -83,6 +83,10 @@ uint8_t core_get_register_v(Core* core,
 void core_add_to_register_v(Core* core,
                             uint8_t register_number,
                             uint8_t value); // 7XNN
+
+void core_push_to_stack(Core* core,
+                        uint16_t value);
+uint16_t core_pop_from_stack(Core* core);
 
 uint16_t core_get_index(Core* core);
 void core_set_index(Core* core,
