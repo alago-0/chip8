@@ -170,72 +170,97 @@ void core_decode_execute(Core* core)
   switch (first_nibble)
   {
     case 0x0:
+    {
       switch (second_third_fourth_nibbles)
       {
         case 0x0E0: // 00E0
+        {
           core_clear_screen(core);
           break;
+        }
         case 0x0EE: // 00EE
-          //core_set_pc(core,
-          //            core_pop_from_stack(core));
+        {
+          core_set_pc(core,
+                      core_pop_from_stack(core));
           break;
+        }
         default:
+        {
           break;
+        }
       }
       break;
+    }
    
     case 0x1: // 1NNN
+    {
       core_set_pc(core,
                   second_third_fourth_nibbles);
       break;
+    }
     
     case 0x2: // 2NNN
-      //core_push_to_stack(core, 
-      //                   core->pc);
-      //core_set_pc(core, 
-      //            second_third_fourth_nibbles);
+    {
+      core_push_to_stack(core, 
+                         core->pc);
+      core_set_pc(core, 
+                  second_third_fourth_nibbles);
       break;
+    }
 
     case 0x3: // 3XNN
+    {
       core_skip_instruction_if_equal(core,
                                      core_get_register_v(core, second_nibble),
                                      second_byte);
       break;
+    }
 
     case 0x4: // 4XNN
+    {
       core_skip_instruction_if_not_equal(core,
                                          core_get_register_v(core, second_nibble),
                                          second_byte);
       break;
+    }
 
     case 0x5: // 5XY0
+    {
       core_skip_instruction_if_equal(core,
                                      core_get_register_v(core, second_nibble),
                                      core_get_register_v(core, third_nibble));
       break;
+    }
 
     case 0x6: // 6XNN
+    {
       core_set_register_v(core,
                           second_nibble,
                           second_byte);
       break;
+    }
 
     case 0x7: // 7XNN
+    {
       core_add_to_register_v(core,
                              second_nibble,
                              second_byte);
       break;
+    }
 
     case 0x8: // 8...
         switch (fourth_nibble)
         {
           case 0x0: // 8XY0
+          {
             core_set_register_v(core,
                                 second_nibble,
                                 core_get_register_v(core,
                                                     third_nibble));
             break;
+          }
           case 0x1: // 8XY1
+          {
             core_set_register_v(core,
                                 second_nibble,
                                 core_get_register_v(core,
@@ -243,7 +268,9 @@ void core_decode_execute(Core* core)
                                 core_get_register_v(core,
                                                     third_nibble));
             break;
+          }
           case 0x2: // 8XY2
+          {
             core_set_register_v(core,
                                 second_nibble,
                                 core_get_register_v(core,
@@ -251,7 +278,9 @@ void core_decode_execute(Core* core)
                                 core_get_register_v(core,
                                                     third_nibble));
             break;
+          }
           case 0x3: // 8XY3
+          {
              core_set_register_v(core,
                                 second_nibble,
                                 core_get_register_v(core,
@@ -259,6 +288,7 @@ void core_decode_execute(Core* core)
                                 core_get_register_v(core,
                                                     third_nibble));
             break;
+          }
 
           case 0x4: // 8XY4
           {
@@ -275,6 +305,7 @@ void core_decode_execute(Core* core)
           }
           
           case 0x5: // 8XY5
+          {
             core_set_register_v(core,
                                 second_nibble,
                                 core_get_register_v(core,
@@ -282,8 +313,31 @@ void core_decode_execute(Core* core)
                                 core_get_register_v(core,
                                                     third_nibble));
             break;
-          
+          }
+         
+          case 0x6: // 8XY6
+          {
+            core_set_register_v(core,
+                                second_nibble,
+                                core_get_register_v(core,
+                                                     third_nibble));
+            bool is_bit_one = core_get_register_v(core,
+                                                  second_nibble) & 1;
+            is_bit_one == true ? 
+                          core_set_register_v(core,
+                                              0xF,
+                                              1) :
+                          core_set_register_v(core,
+                                              0xF,
+                                              0);
+            core_set_register_v(core,
+                                second_nibble,
+                                core_get_register_v(core,
+                                                    second_nibble) >> 1);
+            break;
+          }
           case 0x7: // 8XY7
+          {
             core_set_register_v(core,
                                 second_nibble,
                                 core_get_register_v(core,
@@ -291,28 +345,59 @@ void core_decode_execute(Core* core)
                                 core_get_register_v(core,
                                                     second_nibble));           
             break;
+          }
+          
+          case 0xE: // 8XYE
+          {
+
+            core_set_register_v(core,
+                                second_nibble,
+                                core_get_register_v(core,
+                                                     third_nibble));
+            bool is_bit_one = (core_get_register_v(core,
+                                                   second_nibble) >> 7) & 1;
+            is_bit_one == true ? 
+                          core_set_register_v(core,
+                                              0xF,
+                                              1) :
+                          core_set_register_v(core,
+                                              0xF,
+                                              0);
+            core_set_register_v(core,
+                                second_nibble,
+                                core_get_register_v(core,
+                                                    second_nibble) << 1);
+            break;
+          }
         }
         break;
     
     case 0x9: // 9XY0
+    {
       core_skip_instruction_if_not_equal(core,
                                          core_get_register_v(core, second_nibble),
                                          core_get_register_v(core, third_nibble));
       break;
+    }
 
     case 0xA: // ANNN
+    {
       core_set_index(core,
                      second_third_fourth_nibbles);
       break;
+    }
 
     case 0xD: // DXYN
+    {
       core_draw(core,
                 second_nibble,
                 third_nibble,
                 fourth_nibble);
       break;
+    }
 
     case 0xF: // F...
+    {
       switch (second_byte)
       {
         case 0x33: // FX33
@@ -362,9 +447,12 @@ void core_decode_execute(Core* core)
         }
       }
       break;
+    }
       
     default:
+    {
       break;
+    }
   }
 }
 
@@ -518,10 +606,6 @@ void core_push_to_stack(Core* core,
   }
 
   core->stack[core->sp++] = value;
-  printf("--- core_push_to_stac DEBUG ---\n");
-  printf("core->sp = %d\n", core->sp);
-  printf("core->stack[core->sp - 1] = %d\n", core->stack[core->sp - 1]);
-  printf("core->stack[core->sp] = %d\n", core->stack[core->sp]);
 }
 
 
@@ -533,7 +617,7 @@ uint16_t core_pop_from_stack(Core* core)
     exit(1);
   }
 
-  return core->stack[core->sp--];
+  return core->stack[--core->sp];
 }
 
 
